@@ -1,0 +1,42 @@
+{
+  "name": "mobile",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@types/jest": "30.0.0",
+    "expo": "~58.0.22",
+    "expo-constants": "~58.0.14",
+    "expo-status-bar": "~58.0.4",
+    "jest": "~30.5.2",
+    "jest-expo": "~58.0.13",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
+    "@types/react": "~19.3.0",
+    "patch-package": "^8.0.1",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "postinstall": "patch-package",
+    "brand": "node scripts/select-brand.js",
+    "start:a": "BRAND=a npm run brand && BRAND=a expo start --clear",
+    "start:b": "BRAND=b npm run brand && BRAND=b expo start --clear",
+    "ios:a": "BRAND=a npm run brand && BRAND=a expo prebuild --clean -p ios && BRAND=a expo run:ios",
+    "ios:b": "BRAND=b npm run brand && BRAND=b expo prebuild --clean -p ios && BRAND=b expo run:ios",
+    "android:a": "BRAND=a npm run brand && BRAND=a expo prebuild --clean -p android && BRAND=a expo run:android",
+    "android:b": "BRAND=b npm run brand && BRAND=b expo prebuild --clean -p android && BRAND=b expo run:android",
+    "test": "jest"
+  },
+  "private": true
+}

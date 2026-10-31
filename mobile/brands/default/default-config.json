@@ -1,0 +1,13 @@
+{
+  "version": 0,
+  "theme": { "primary": "#00AA77", "onPrimary": "#FFFFFF" },
+  "flags": { "showRewards": true },
+  "home": [
+    { "id": "d1", "type": "balance_card", "props": { "points": "0" } },
+    {
+      "id": "d2",
+      "type": "banner",
+      "props": { "title": "Welcome" }
+    }
+  ]
+}

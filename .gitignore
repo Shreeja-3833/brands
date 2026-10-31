@@ -1,0 +1,8 @@
+node_modules/
+.expo/
+mobile/ios
+mobile/android
+mobile/src/generated
+server/.venv
+__pycache__/
+.DS_Store

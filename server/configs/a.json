@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "theme": { "primary": "#00AA77", "onPrimary": "#FFFFFF" },
+  "flags": { "showRewards": true },
+  "home": [
+    { "id": "h1", "type": "balance_card", "props": { "points": "1250" } },
+    { "id": "h2", "type": "banner", "props": { "title": "Double points Friday", "imageUrl": "https://picsum.photos/seed/brew/800/300" } },
+    { "id": "h3", "type": "reward_list", "props": { "limit": 3 } }
+  ]
+}
