@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { BRAND } from "../config/brand";
 import { useConfig } from "../config/ConfigProvider";
 import { useTheme } from "../theme/ThemeProvider";
+import { BlockRenderer } from "../sdui/BlockRenderer";
 
 export function Home() {
   const { config, source } = useConfig();
@@ -10,11 +11,20 @@ export function Home() {
   return (
     <ScrollView style={{ backgroundColor: theme.background }}>
       <View style={[styles.header, { backgroundColor: theme.primary }]}>
-        <Text style={[styles.title, { color: theme.onPrimary }]}>{BRAND.name}</Text>
+        <Text style={[styles.title, { color: theme.onPrimary }]}>
+          {BRAND.name}
+        </Text>
       </View>
-      {__DEV__ && <Text style={styles.debug}>config v{config.version} · {source}</Text>}
-      {/* Temporary: replaced by the block renderer in the next step */}
-      <Text style={styles.raw}>{JSON.stringify(config.home, null, 2)}</Text>
+      {__DEV__ && (
+        <Text style={styles.debug}>
+          config v{config.version} · {source}
+        </Text>
+      )}
+      <BlockRenderer
+        key={config.version}
+        blocks={config.home}
+        flags={config.flags}
+      />
     </ScrollView>
   );
 }
