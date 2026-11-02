@@ -15,7 +15,7 @@ brands/
     └── configs/<id>.json
 ```
 
-🎥 **Loom:** _link coming soon_
+🎥 **Loom:** [Walkthrough Link](https://www.loom.com/share/accb9fd5113041e7a7908fec342ab9c7)
 
 <details>
 <summary><strong>2. Tech stack and why</strong></summary>
