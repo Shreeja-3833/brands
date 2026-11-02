@@ -4,5 +4,5 @@
   "slug": "brew-rewards",
   "bundleId": "com.yourname.brewrewards",
   "icon": "./brands/a/icon.png",
-  "colors": { "primary": "pink", "onPrimary": "#FFFFFF", "background": "#F4FBF8" }
+  "colors": { "primary": "#FFC0CB", "onPrimary": "#FFFFFF", "background": "#F4FBF8" }
 }

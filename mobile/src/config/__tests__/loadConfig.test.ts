@@ -13,6 +13,13 @@ jest.mock("../brand", () => ({
 
 const remote = { version: 7, theme: {}, flags: { showRewards: true }, home: [] };
 const mockFetch = jest.fn();
+const ok = (body: unknown, etag: string | null = null) => ({
+  ok: true,
+  status: 200,
+  headers: { get: (name: string) => (name === "ETag" ? etag : null) },
+  json: async () => body,
+});
+const notModified = { ok: false, status: 304, headers: { get: () => null } };
 
 beforeEach(async () => {
   await AsyncStorage.clear();
@@ -22,7 +29,7 @@ beforeEach(async () => {
 
 describe("loadConfig", () => {
   it("returns the network config and caches it", async () => {
-    mockFetch.mockResolvedValue({ ok: true, json: async () => remote });
+    mockFetch.mockResolvedValue(ok(remote));
 
     const result = await loadConfig();
 
@@ -46,5 +53,32 @@ describe("loadConfig", () => {
 
     expect(result.source).toBe("default");
     expect(result.config.version).toBe(0);
+  });
+
+  it("stores the ETag and sends it on the next request", async () => {
+    mockFetch.mockResolvedValue(ok(remote, '"abc"'));
+    await loadConfig();
+
+    await loadConfig();
+
+    expect(mockFetch.mock.calls[1][1].headers).toEqual({ "If-None-Match": '"abc"' });
+  });
+
+  it("serves the cached config as fresh on 304 Not Modified", async () => {
+    mockFetch.mockResolvedValueOnce(ok(remote, '"abc"')).mockResolvedValueOnce(notModified);
+    await loadConfig();
+
+    const result = await loadConfig();
+
+    expect(result).toEqual({ config: remote, source: "network" });
+  });
+
+  it("does not send an ETag when there is no cached body to back it", async () => {
+    await AsyncStorage.setItem("config:test:etag", '"abc"');
+    mockFetch.mockResolvedValue(ok(remote));
+
+    await loadConfig();
+
+    expect(mockFetch.mock.calls[0][1].headers).toBeUndefined();
   });
 });
