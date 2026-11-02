@@ -15,14 +15,7 @@ brands/
     └── configs/<id>.json
 ```
 
-<details>
-<summary><strong>1. Walkthrough video</strong></summary>
-
-<br>
-
 🎥 **Loom:** _link coming soon_
-
-</details>
 
 <details>
 <summary><strong>2. Tech stack and why</strong></summary>
