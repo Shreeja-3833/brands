@@ -1,4 +1,4 @@
-# Brands: white-label loyalty app
+# Brands
 
 One React Native codebase that ships as many branded apps. Each brand gets its own app name, icon, bundle ID and colors at build time. Each brand's home screen layout, theme overrides and feature flags come from a FastAPI server at runtime, so they change without an app release.
 
