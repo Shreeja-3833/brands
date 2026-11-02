@@ -2,7 +2,11 @@
   "id": "a",
   "name": "Brew Rewards",
   "slug": "brew-rewards",
-  "bundleId": "com.yourname.brewrewards",
+  "bundleId": "com.brands.brewrewards",
   "icon": "./brands/a/icon.png",
-  "colors": { "primary": "#FFC0CB", "onPrimary": "#FFFFFF", "background": "#F4FBF8" }
+  "colors": {
+    "primary": "#FFC0CB",
+    "onPrimary": "#FFFFFF",
+    "background": "#F4FBF8"
+  }
 }

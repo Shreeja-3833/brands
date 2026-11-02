@@ -2,7 +2,11 @@
   "id": "b",
   "name": "Bloom Club",
   "slug": "bloom-club",
-  "bundleId": "com.yourname.bloomclub",
+  "bundleId": "com.brands.bloomclub",
   "icon": "./brands/b/icon.png",
-  "colors": { "primary": "#7A3FD1", "onPrimary": "#FFFFFF", "background": "#F7F3FD" }
+  "colors": {
+    "primary": "#7A3FD1",
+    "onPrimary": "#FFFFFF",
+    "background": "#F7F3FD"
+  }
 }

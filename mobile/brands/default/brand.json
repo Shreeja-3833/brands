@@ -2,7 +2,11 @@
   "id": "a",
   "name": "default",
   "slug": "default",
-  "bundleId": "com.yourname.default",
+  "bundleId": "com.brands.default",
   "icon": "./brands/default/icon.png",
-  "colors": { "primary": "#00AA77", "onPrimary": "#FFFFFF", "background": "#F4FBF8" }
+  "colors": {
+    "primary": "#00AA77",
+    "onPrimary": "#FFFFFF",
+    "background": "#F4FBF8"
+  }
 }
