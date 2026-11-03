@@ -1,11 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
+import { API_URL } from "./api";
 import { BRAND, DEFAULT_CONFIG } from "./brand";
 import { AppConfig, ConfigSchema, ConfigSource } from "./schema";
 
-const API_URL =
-  process.env.EXPO_PUBLIC_API_URL ??
-  (Platform.OS === "android" ? "http://10.0.2.2:8000" : "http://localhost:8000");
 const CACHE_KEY = `config:${BRAND.id}`;
 const ETAG_KEY = `${CACHE_KEY}:etag`;
 const TIMEOUT_MS = 3000;

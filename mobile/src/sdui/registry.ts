@@ -2,6 +2,7 @@ import { ComponentType } from "react";
 import { z } from "zod";
 import { BalanceCard, balanceCardSchema } from "../blocks/BalanceCard";
 import { Banner, bannerSchema } from "../blocks/Banner";
+import { ImageBlock, imageSchema } from "../blocks/ImageBlock";
 import { RewardList, rewardListSchema } from "../blocks/RewardList";
 
 export type BlockDefinition<P = any> = {
@@ -20,5 +21,6 @@ function defineBlock<P>(def: BlockDefinition<P>): BlockDefinition {
 export const registry: Registry = {
   balance_card: defineBlock({ schema: balanceCardSchema, component: BalanceCard, requiresFlag: "showRewards" }),
   banner: defineBlock({ schema: bannerSchema, component: Banner }),
+  image: defineBlock({ schema: imageSchema, component: ImageBlock }),
   reward_list: defineBlock({ schema: rewardListSchema, component: RewardList, requiresFlag: "showRewards" }),
 };
