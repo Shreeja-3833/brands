@@ -39,3 +39,47 @@ def test_config_returns_200_when_etag_is_stale():
     res = client.get("/config", params={"brand": "a"}, headers={"If-None-Match": '"stale"'})
     assert res.status_code == 200
     assert "version" in res.json()
+
+
+# Dummy key for tests only; the real key lives in server/.env (gitignored).
+TEST_KEY = "test-key"
+
+
+def test_image_requires_key_header(monkeypatch):
+    monkeypatch.setenv("IMAGE_KEY", TEST_KEY)
+    res = client.get("/images/seasonal.jpg")
+    assert res.status_code == 401
+
+
+def test_image_rejects_wrong_key(monkeypatch):
+    monkeypatch.setenv("IMAGE_KEY", TEST_KEY)
+    res = client.get("/images/seasonal.jpg", headers={"X-Image-Key": "wrong"})
+    assert res.status_code == 403
+
+
+def test_image_served_with_correct_key(monkeypatch):
+    monkeypatch.setenv("IMAGE_KEY", TEST_KEY)
+    res = client.get("/images/seasonal.jpg", headers={"X-Image-Key": TEST_KEY})
+    assert res.status_code == 200
+    assert res.headers["content-type"] == "image/jpeg"
+    assert res.headers["cache-control"].startswith("private")
+    assert len(res.content) > 0
+
+
+def test_image_unknown_name_returns_404(monkeypatch):
+    monkeypatch.setenv("IMAGE_KEY", TEST_KEY)
+    res = client.get("/images/missing.jpg", headers={"X-Image-Key": TEST_KEY})
+    assert res.status_code == 404
+
+
+def test_image_rejects_names_outside_pattern(monkeypatch):
+    monkeypatch.setenv("IMAGE_KEY", TEST_KEY)
+    for name in ["..%2Fmain.py", "main.py", "SEASONAL.JPG", ".env"]:
+        res = client.get(f"/images/{name}", headers={"X-Image-Key": TEST_KEY})
+        assert res.status_code == 404, name
+
+
+def test_image_refuses_when_server_key_unset(monkeypatch):
+    monkeypatch.delenv("IMAGE_KEY", raising=False)
+    res = client.get("/images/seasonal.jpg", headers={"X-Image-Key": "anything"})
+    assert res.status_code == 503

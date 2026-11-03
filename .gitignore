@@ -6,3 +6,4 @@ mobile/src/generated
 server/.venv
 __pycache__/
 .DS_Store
+server/.env
