@@ -31,12 +31,12 @@
     "web": "expo start --web",
     "postinstall": "patch-package",
     "brand": "node scripts/select-brand.js",
-    "start:a": "BRAND=a npm run brand && BRAND=a expo start --clear",
-    "start:b": "BRAND=b npm run brand && BRAND=b expo start --clear",
-    "ios:a": "BRAND=a npm run brand && BRAND=a expo prebuild --clean -p ios && BRAND=a expo run:ios",
-    "ios:b": "BRAND=b npm run brand && BRAND=b expo prebuild --clean -p ios && BRAND=b expo run:ios",
-    "android:a": "BRAND=a npm run brand && BRAND=a expo prebuild --clean -p android && BRAND=a expo run:android",
-    "android:b": "BRAND=b npm run brand && BRAND=b expo prebuild --clean -p android && BRAND=b expo run:android",
+    "start:a": "BRAND=a expo start --clear",
+    "start:b": "BRAND=b expo start --clear",
+    "ios:a": "BRAND=a expo prebuild --clean -p ios && BRAND=a expo run:ios",
+    "ios:b": "BRAND=b expo prebuild --clean -p ios && BRAND=b expo run:ios",
+    "android:a": "BRAND=a expo prebuild --clean -p android && BRAND=a expo run:android",
+    "android:b": "BRAND=b expo prebuild --clean -p android && BRAND=b expo run:android",
     "test": "jest"
   },
   "private": true

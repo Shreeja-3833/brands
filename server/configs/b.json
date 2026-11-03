@@ -1,6 +1,7 @@
 {
-  "version": 1,
-  "theme": { "primary": "#7A3FD1", "onPrimary": "#FFFFFF" },
+  "version": 2,
+  "name": "Bloom Club",
+  "theme": { "primary": "#7A3FD1", "onPrimary": "#FFFFFF", "background": "#F7F3FD" },
   "flags": { "showRewards": true },
   "home": [
     { "id": "h1", "type": "banner", "props": { "title": "Spring bouquets are here", "imageUrl": "https://picsum.photos/seed/bloom/800/300" } },

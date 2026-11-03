@@ -1,6 +1,7 @@
 {
   "version": 4,
-  "theme": { "primary": "#00AA78", "onPrimary": "#FFFFFF" },
+  "name": "Brew Rewards",
+  "theme": { "primary": "#00AA78", "onPrimary": "#FFFFFF", "background": "#F4FBF8" },
   "flags": { "showRewards": true },
   "home": [
     { "id": "h1", "type": "balance_card", "props": { "points": "1250" } },

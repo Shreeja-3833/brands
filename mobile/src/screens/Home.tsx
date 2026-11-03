@@ -12,7 +12,7 @@ export function Home() {
     <ScrollView style={{ backgroundColor: theme.background }}>
       <View style={[styles.header, { backgroundColor: theme.primary }]}>
         <Text style={[styles.title, { color: theme.onPrimary }]}>
-          {BRAND.name}
+          {config.name ?? BRAND.name}
         </Text>
       </View>
       {__DEV__ && (

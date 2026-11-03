@@ -1,6 +1,7 @@
 {
   "version": 0,
-  "theme": { "primary": "#7A3FD1", "onPrimary": "#FFFFFF" },
+  "name": "Bloom Club",
+  "theme": { "primary": "#7A3FD1", "onPrimary": "#FFFFFF", "background": "#F7F3FD" },
   "flags": { "showRewards": false },
   "home": [
     { "id": "d1", "type": "balance_card", "props": { "points": "0" } },
