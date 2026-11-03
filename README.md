@@ -64,24 +64,57 @@ The rule: **anything the operating system or app store reads must be built into 
 - **JS release** means a new JavaScript bundle. Today that is also a rebuild. With EAS Update it could ship over the air without store review.
 - **Server** means edit `server/configs/<brand>.json`. It goes live within about 5–10 seconds, with no release.
 
+### Where the app gets brand identity at runtime
+
+The app no longer reads `mobile/src/generated/brand.json`. That file can be `{}` and the app still knows its brand, fetches its config, and renders its name, colours and layout. Nothing in the run scripts rewrites it any more: `start:*`, `ios:*` and `android:*` no longer call `npm run brand`. The `brand` script and `scripts/select-brand.js` are unchanged but no longer needed.
+
+| Piece | Where it comes from (first one available wins) | Code |
+|---|---|---|
+| **Brand id** | Built in. `app.config.ts` copies the `BRAND` env var into `extra.brandId`, and the app reads it with `expo-constants`. If unset, it is `"default"`. | `src/config/brand.ts` |
+| **Name** | 1. `name` in the server config<br>2. the cached config<br>3. the bundled `default-config.json`<br>4. the native app name (`Constants.expoConfig.name`, set at build from `brands/<id>/brand.json`) | `src/screens/Home.tsx` |
+| **Colours** (`primary`, `onPrimary`, `background`) | 1. `theme` in the server config<br>2. the cached config<br>3. the bundled `default-config.json`<br>4. a neutral built-in `FALLBACK_THEME`, for any colour still missing | `src/theme/ThemeProvider.tsx` |
+| **Layout and flags** | 1. the server config<br>2. the cached config<br>3. the bundled `default-config.json` | `src/config/loadConfig.ts` |
+| **Native identity** (bundle id, icon, home-screen name, Android icon colour) | Read at build time by `app.config.ts` from `mobile/brands/<id>/brand.json`. This never touches `src/generated/`. | `app.config.ts` |
+
+The offline fallback is the built-in default config for the build's brand. `app.config.ts` reads `mobile/brands/<BRAND>/default-config.json` at build time and puts it in `extra.defaultConfig`. The build stops with a clear error if the file is missing or has no numeric `version` and `home` array. The app reads it with `expo-constants`, so each build contains only its own brand's default, not every brand's.
+
+**Trade-offs of building the default into the Expo config:**
+
+| | |
+|---|---|
+| ✅ **Only one brand per build** | Brand A's build has no Bloom Club data. This was checked with `BRAND=a expo export`: no brand's default appears in the JS bundle. App size stays flat as brands are added. |
+| ✅ **No generated files or extra tooling** | It reuses the same `extra` path the brand id already takes. There's no copy step, nothing in `src/generated/`, and no custom Metro resolver. |
+| ✅ **Fails at build time** | A missing or malformed default stops the build, instead of surfacing on a user's first offline launch. |
+| ⚠️ **Lives in the native app's config, not the JS bundle** | `expo-constants` builds the config into the native app at build time. Changing a default needs a new build, or an EAS Update, since updates carry the Expo config too. That's the same cost as before. |
+| ⚠️ **Restart Metro to switch brands** | In development the config is read when Metro starts, so changing `BRAND` needs a restart. The `start:*` scripts already use `--clear`. |
+| ⚠️ **Size and validation limits** | The whole Expo config is parsed on every launch, so a large default would slow startup. Keep defaults small, the way they are now. Also, the build-time check is only a basic shape check. Full validation still happens in the app with `ConfigSchema`. |
+| ⚠️ **A last-resort fallback is still needed** | If `extra.defaultConfig` is missing, for example in tests or a misconfigured build, the app uses an empty layout with the native name and neutral colours. |
+
+Alternative not taken: a custom resolver in `metro.config.js` that maps an import to `brands/${BRAND}/default-config.json`. That would keep the default as a normal module in the JS bundle, but it means more setup, and Metro's cache has to be cleared whenever the brand changes.
+
+| Server unreachable, and… | What renders |
+|---|---|
+| …the app has fetched before | The last config it received, from the cache: the real name, colours and layout. |
+| …it's a fresh install | The bundled default for that brand: its name, colours and a welcome layout. |
+| …the default is missing a name or colour | The native app name, and neutral colours for the missing ones. |
+
 ### Brand identity (`mobile/brands/<id>/brand.json`)
 
 | Setting | Source | Why |
 |---|---|---|
-| `name` | **Rebuild** | The name under the home-screen icon is written into the native app files (Info.plist / AndroidManifest). |
+| `name` | **Rebuild** for the home-screen name. **Server** for the in-app header. | The name under the home-screen icon is written into the native app files (Info.plist / AndroidManifest). The header inside the app shows `name` from the server config, and uses this native name only as the last fallback. |
 | `bundleId` | **Rebuild** | The app's identity in the App Store and Play Store, and what signing is tied to. It can never change for a published app. |
 | `slug` / `scheme` | **Rebuild** | The deep-link URL scheme (`brew-rewards://`) is registered with the OS at install time. |
 | `icon` | **Rebuild** | The OS reads app icons from the native build. |
-| `colors.primary` | **Rebuild** for the Android icon background. **Server** for the in-app color. | The Android adaptive icon background is a native resource. Inside the app it is only the fallback and can be overridden by `theme.primary` from the server. |
-| `colors.onPrimary` | **JS release** (fallback) / **Server** (override) | Fallback text color on the primary color. The server can override it with `theme.onPrimary`. |
-| `colors.background` | **JS release** | Screen background. It is not in the server schema yet, so changing it needs a release. |
-| `id` | **Rebuild** | Picks which brand folder is built, and is the `?brand=` the app asks the server for. |
+| `colors.*` | **Rebuild**, for the Android icon background only | Only `colors.primary` is still read, for the Android adaptive icon background, which is a native resource. In-app colours come from `theme.*` in the server config (see below). |
+| `id` | **Rebuild** | Picks which brand folder is built. It is passed to the app as `extra.brandId` and becomes the `?brand=` the app asks the server for. |
 
 ### Runtime config (`server/configs/<id>.json`)
 
 | Setting | Source | Why |
 |---|---|---|
-| `theme.primary`, `theme.onPrimary` | **Server** | Only used by our own components. Invalid hex values are ignored and the brand color is used instead. |
+| `name` | **Server** | The brand name in the in-app header. |
+| `theme.primary`, `theme.onPrimary`, `theme.background` | **Server** | Only used by our own components. Invalid hex values are ignored, and the bundled default's colour (or a neutral fallback) is used instead. |
 | `flags.*` (e.g. `showRewards`) | **Server** | Turn features on and off without a release. Blocks with `requiresFlag` are hidden when their flag is off. |
 | `home` (block list, order, props) | **Server** | This is the server-driven UI. Reorder, add, remove or re-text blocks instantly. |
 | `version` | **Server** | Labels the config. Shown in the dev debug line, and the block list re-mounts when it changes. |
@@ -90,7 +123,7 @@ The rule: **anything the operating system or app store reads must be built into 
 
 | Setting | Source | Why |
 |---|---|---|
-| `default-config.json` | **JS release** | Bundled offline fallback. It has to ship in the app to work with no network. |
+| `default-config.json` | **Rebuild** (or EAS Update) | Offline fallback, including the brand's name and colours. `app.config.ts` builds only this brand's default into the app's Expo config (`extra.defaultConfig`), because it has to be in the app to work with no network. |
 | **New block types** (`src/sdui/registry.ts`) | **JS release** (**Rebuild** if they add native code) | The server can only use components the app already contains. Unknown types are skipped safely. |
 | `EXPO_PUBLIC_API_URL` | **JS release** | Built into the JavaScript bundle at build time. |
 | `POLL_MS` (5 s), fetch timeout (3 s) | **JS release** | Constants in `ConfigProvider.tsx` and `loadConfig.ts`. |

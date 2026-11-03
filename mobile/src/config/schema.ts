@@ -9,7 +9,8 @@ const Hex = z
 
 export const ConfigSchema = z.object({
   version: z.number(),
-  theme: z.object({ primary: Hex, onPrimary: Hex }).default({}),
+  name: z.string().min(1).optional().catch(undefined),
+  theme: z.object({ primary: Hex, onPrimary: Hex, background: Hex }).default({}),
   flags: z.record(z.string(), z.boolean()).default({}),
   home: z.array(z.unknown()).default([]),
 });
