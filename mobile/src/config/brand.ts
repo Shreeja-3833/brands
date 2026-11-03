@@ -7,7 +7,6 @@ const brandId: string = expoConfig?.extra?.brandId ?? "default";
 
 export const BRAND = {
   id: brandId,
-  // Native app name from the build; only shown when no config supplies a name.
   name: expoConfig?.name ?? "",
 };
 

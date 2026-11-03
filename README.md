@@ -18,6 +18,7 @@ brands/
 🎥 **Loom:** 
 - [Walkthrough Link](https://www.loom.com/share/accb9fd5113041e7a7908fec342ab9c7)
 - [Image Rendering](https://www.loom.com/share/c599ac947f3f45659202a2ccb178c0b9)
+- [Removing dependency from generated files](https://www.loom.com/share/e4bd3f5136834195a8ff836857a8d6e1)
 
 <details>
 <summary><strong>2. Tech stack and why</strong></summary>
