@@ -10,7 +10,9 @@ const TIMEOUT_MS = 3000;
 export type LoadedConfig = { config: AppConfig; source: ConfigSource };
 
 // null means 304: the copy we already have is still current.
-async function fetchRemote(etag: string | null): Promise<{ config: AppConfig; etag: string | null } | null> {
+async function fetchRemote(
+  etag: string | null,
+): Promise<{ config: AppConfig; etag: string | null } | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -20,7 +22,10 @@ async function fetchRemote(etag: string | null): Promise<{ config: AppConfig; et
     });
     if (res.status === 304) return null;
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return { config: ConfigSchema.parse(await res.json()), etag: res.headers.get("ETag") };
+    return {
+      config: ConfigSchema.parse(await res.json()),
+      etag: res.headers.get("ETag"),
+    };
   } finally {
     clearTimeout(timer);
   }
@@ -39,11 +44,16 @@ export async function loadConfig(): Promise<LoadedConfig> {
   const cached = await readCache();
   try {
     // Only send the ETag when we hold the matching body, so a 304 is always servable.
-    const etag = cached ? await AsyncStorage.getItem(ETAG_KEY).catch(() => null) : null;
+    const etag = cached
+      ? await AsyncStorage.getItem(ETAG_KEY).catch(() => null)
+      : null;
     const remote = await fetchRemote(etag);
     if (!remote) return { config: cached!, source: "network" };
-    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(remote.config)).catch(() => {});
-    if (remote.etag) await AsyncStorage.setItem(ETAG_KEY, remote.etag).catch(() => {});
+    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(remote.config)).catch(
+      () => {},
+    );
+    if (remote.etag)
+      await AsyncStorage.setItem(ETAG_KEY, remote.etag).catch(() => {});
     else await AsyncStorage.removeItem(ETAG_KEY).catch(() => {});
     return { config: remote.config, source: "network" };
   } catch (e) {

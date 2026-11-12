@@ -10,7 +10,12 @@ const BlockShape = z.object({
   props: z.record(z.string(), z.unknown()).default({}),
 });
 
-export type ResolvedBlock = { id: string; type: string; Component: ComponentType<any>; props: unknown };
+export type ResolvedBlock = {
+  id: string;
+  type: string;
+  Component: ComponentType<any>;
+  props: unknown;
+};
 
 const warn = (...args: unknown[]) => {
   if (__DEV__) console.log("[sdui]", ...args);
@@ -19,7 +24,7 @@ const warn = (...args: unknown[]) => {
 export function resolveBlocks(
   blocks: unknown[],
   flags: Record<string, boolean>,
-  registry: Registry = defaultRegistry
+  registry: Registry = defaultRegistry,
 ): ResolvedBlock[] {
   const resolved: ResolvedBlock[] = [];
 
@@ -39,9 +44,20 @@ export function resolveBlocks(
 
     if (def.requiresFlag && flags[def.requiresFlag] !== true) continue;
 
-    const parsed = def.schema.safeParse(props);
+    let parsed = def.schema.safeParse(props);
     if (!parsed.success) {
-      warn(`dropped "${id}", invalid props:`, parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`));
+      const bad = new Set(parsed.error.issues.map((i) => String(i.path[0])));
+      warn(`"${id}": ignoring invalid props`, [...bad]);
+      const trimmed = Object.fromEntries(
+        Object.entries(props).filter(([k]) => !bad.has(k)),
+      );
+      parsed = def.schema.safeParse(trimmed);
+    }
+    if (!parsed.success) {
+      warn(
+        `dropped "${id}", invalid props:`,
+        parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+      );
       continue;
     }
 
@@ -51,10 +67,17 @@ export function resolveBlocks(
   return resolved;
 }
 
-type Props = { blocks: unknown[]; flags: Record<string, boolean>; registry?: Registry };
+type Props = {
+  blocks: unknown[];
+  flags: Record<string, boolean>;
+  registry?: Registry;
+};
 
 export function BlockRenderer({ blocks, flags, registry }: Props) {
-  const resolved = useMemo(() => resolveBlocks(blocks, flags, registry), [blocks, flags, registry]);
+  const resolved = useMemo(
+    () => resolveBlocks(blocks, flags, registry),
+    [blocks, flags, registry],
+  );
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       {resolved.map(({ id, type, Component, props }) => (
